@@ -1,37 +1,46 @@
 # require modules here
 require "yaml"
 require 'pry'
+emoticon = YAML.load_file('./lib/emoticons.yml')
 
 def load_library(file_path)
-  emoticons = YAML.load_file("./lib/emoticons.yml")
-  return_hash = {
-    "get_meaning" => {},
-    "get_emoticon" => {},
-  }
-
-  emoticons.each do |meaning, translations|
-    return_hash["get_meaning"][translations[1]] = meaning
-    return_hash["get_emoticon"][translations[0]] = translations[1]
-  end
-  return_hash
+  emoticon = YAML.load_file('./lib/emoticons.yml')
+  new_hash={}
+    emoticon.each do |words, symbols| #=> iterate over "meaning" and "symbols"
+    
+     symbols = {:english => symbols[0], :japanese =>symbols [1]} # => add new inner key-value pair for the value symbols
+     
+      h = {words => symbols} #=>create { "happy" =>{:english =>..., :japanese => ...}}
+      
+      new_hash.merge!(h) #merge h-hash with the new_hash, use ! for destructive merge
+     end 
+     
+  return new_hash
 end
 
-def get_japanese_emoticon(file_path, emoticon)
-  emoticons = load_library(file_path)
-  emoticons["get_emoticon"].each do |english_emoticon, japanese_emoticon|
-    if emoticon == english_emoticon
-      return japanese_emoticon
-    end
-  end
+
+
+def get_japanese_emoticon(emoticon, symbol)
+ load_library(emoticon).each do |signs, lang|
+    if load_library(emoticon)[signs][:english] == symbol
+       return load_library(emoticon)[signs][:japanese]
+    end 
+ end 
+   return "Sorry, that emoticon was not found"
+end
+
+
+def get_english_meaning(emoticon, symbol)
+   emoticon_hash= load_library('./lib/emoticons.yml')
+    emoticon_hash.each_key do |signs|
+      if emoticon_hash[signs][:japanese] == symbol
+       return signs
+      end 
+    end 
   return "Sorry, that emoticon was not found"
 end
 
-def get_english_meaning(file_path, emoticon)
-  emoticons = load_library(file_path)
-  emoticons["get_meaning"].each do |japanese_emoticon, english_meaning|
-    if emoticon == japanese_emoticon
-      return english_meaning
-    end
-  end
-  return "Sorry, that emoticon was not found"
-end
+ 
+
+
+ 
